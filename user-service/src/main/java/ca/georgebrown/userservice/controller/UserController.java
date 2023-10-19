@@ -5,7 +5,6 @@ import ca.georgebrown.userservice.dto.UserResponse;
 import ca.georgebrown.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +12,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
-@Slf4j
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserRequest userRequest) {
         userService.createUser(userRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
         String username = userService.getUserName(userId);
         if (username == null) {
