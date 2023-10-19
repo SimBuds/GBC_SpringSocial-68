@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
         user.setUsername(userRequest.getUsername());
-        user.setPassword(userRequest.getPassword());  // Hashing needed
+        user.setPassword(userRequest.getPassword());  // Hashing needed still
         user.setEmail(userRequest.getEmail());
         user.setFullName(userRequest.getFullName());
         userRepository.save(user);
