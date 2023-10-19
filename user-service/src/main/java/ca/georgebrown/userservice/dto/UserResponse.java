@@ -15,4 +15,8 @@ public class UserResponse {
         private String username;
         private String email;
         private String fullName;
+
+        public UserResponse(String username) {
+                this.username = username;
+        }
 }
