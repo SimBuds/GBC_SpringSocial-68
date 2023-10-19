@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
                 .build();
         commentRepository.save(comment);
 
-        log.info("Comment created successfully: {}", commentRequest.getId());
+        log.info("Comment created successfully: {}", commentRequest.getContent());
     }
 
     @Override
@@ -59,6 +59,15 @@ public class CommentServiceImpl implements CommentService {
         log.info("Deleting comment {}", commentId);
         commentRepository.deleteById(commentId);
         log.info("Comment deleted successfully: {}", commentId);
+    }
+
+    @Override
+    public List<CommentResponse> getAllComments() {
+        log.info("Getting all comments");
+        List<Comment> comments = commentRepository.findAll();
+        return comments.stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     private CommentResponse mapToDto(Comment comment) {

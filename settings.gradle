@@ -1,1 +1,3 @@
 rootProject.name = 'SpringSocial'
+
+include ':user-service', ':comment-service', ':post-service'

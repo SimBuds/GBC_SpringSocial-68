@@ -2,7 +2,7 @@ package ca.gbc.postservice.controller;
 
 import ca.gbc.postservice.dto.PostRequest;
 import ca.gbc.postservice.dto.PostResponse;
-import ca.gbc.postservice.service.PostService;
+import ca.gbc.postservice.service.PostServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

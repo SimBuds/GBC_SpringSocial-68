@@ -32,7 +32,7 @@ public class PostServiceImpl implements PostService {
                 .build();
         postRepository.save(post);
 
-        log.info("Post created successfully: {}", postRequest.getId());
+        log.info("Post created successfully: {}", postRequest.getTitle());
     }
 
     @Override
@@ -60,6 +60,15 @@ public class PostServiceImpl implements PostService {
         log.info("Deleting post: {}", postId);
         postRepository.deleteById(postId);
         log.info("Post deleted successfully: {}", postId);
+    }
+
+    @Override
+    public List<PostResponse> getAllPosts() {
+        log.info("Getting all posts");
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     private PostResponse mapToDto(Post post) {
