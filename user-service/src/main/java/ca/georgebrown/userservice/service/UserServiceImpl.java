@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
     private UserResponse convertToUserResponse(User user) {
         return UserResponse.builder()
-                .id(user.getId())
+                .id(user.getId().toString())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())

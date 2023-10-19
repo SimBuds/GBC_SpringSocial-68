@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("mysql:mysql-connector-java:8.0.26")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.postgresql:postgresql:42.3.1")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.projectlombok:lombok")
