@@ -14,7 +14,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    String getUserId(String userId);
+    String getUserName(String userId);
 
     String loginUser(UserRequest userRequest);
 
