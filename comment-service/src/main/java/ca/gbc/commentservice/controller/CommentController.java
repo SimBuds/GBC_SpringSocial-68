@@ -38,6 +38,12 @@ public class CommentController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/{commentId}")
+    public ResponseEntity<?> getCommentById(@PathVariable("commentId") String commentId) {
+        String commentAuthorId = commentService.getCommentById(commentId);
+        return new ResponseEntity<>(commentAuthorId, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable("commentId") String commentId) {
         commentService.deleteComment(commentId);

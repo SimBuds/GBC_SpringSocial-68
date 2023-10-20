@@ -54,8 +54,8 @@ services:
     container_name: postgres
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=servicesdb
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./init/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -70,7 +70,8 @@ services:
     container_name: mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_PASSWORD=mypass
+      - MONGO_INITDB_DATABASE=mongodb
 
     volumes:
       - ./data/mongo/posts:/data/db

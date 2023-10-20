@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String getCommentAuthor(String commentId) {
+    public String getCommentById(String commentId) {
         Comment comment = commentRepository.getById(commentId);
         return comment.getAuthorId();
     }

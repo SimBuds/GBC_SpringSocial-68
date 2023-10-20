@@ -1,40 +1,38 @@
 // log the start of script execution
 print('START');
 
-// switch to the post-service db or create if none exist
-db = db.getSiblingDB('post-service');
+// mongo-init.js
 
-db.createPost(
-    {
-        user: 'mongoadmin',
-        pwd: 'password',
-        roles: [{
-            role:'readWrite',
-            db: 'post-service'
-        }]
-    }
-);
+db.createUser({
+    user: "mongoadmin",
+    pwd: "mypass",
+    roles: [
+        {
+            role: "readWrite",
+            db: "testdb"
+        }
+    ]
+});
 
-// create collection named 'post' within the post-service database
-db.createCollection('post')
+// Use the database
+db = db.getSiblingDB('SpringSocialMongo');
 
-// populate the post collection with the initial data
+// Insert sample posts
 db.post.insertMany([
     {
-        title: 'First Post',
-        content: 'This is the first post',
-        authorId: '1',
+        "title": "Sample Post 1",
+        "content": "This is the content of the first sample post.",
+        "authorId": "author123",
+        "createdAt": ISODate("2023-10-19T12:00:00Z"),
+        "updatedAt": ISODate("2023-10-19T12:00:00Z")
     },
     {
-        title: 'Second Post',
-        content: 'This is the second post',
-        authorId: '2',
-    },
-    {
-        title: 'Third Post',
-        content: 'This is the third post',
-        authorId: '1',
-    },
+        "title": "Sample Post 2",
+        "content": "This is the content of the second sample post.",
+        "authorId": "author124",
+        "createdAt": ISODate("2023-10-20T12:00:00Z"),
+        "updatedAt": ISODate("2023-10-20T12:00:00Z")
+    }
 ]);
 
 // log the end of script execution

@@ -14,5 +14,5 @@ public interface CommentService {
 
     void deleteComment(String commentId);
 
-    String getCommentAuthor(String commentId);
+    String getCommentById(String commentId);
 }
