@@ -28,11 +28,11 @@ public class UserController {
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
-        String username = userService.getUserName(userId);
-        if (username == null) {
+        UserResponse user = userService.getUserByUsername(userId);
+        if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new UserResponse(username), HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping

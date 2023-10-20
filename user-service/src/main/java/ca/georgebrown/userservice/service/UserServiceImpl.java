@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-
     @Override
     @Transactional
     public String updateUser(String username, UserRequest userRequest) {
@@ -48,7 +47,6 @@ public class UserServiceImpl implements UserService {
             logger.error("User not found with username: {}", username);
             throw new RuntimeException("User not found");
         }
-
         user.setUsername(userRequest.getUsername());
         user.setPassword(userRequest.getPassword());
         user.setEmail(userRequest.getEmail());
@@ -76,12 +74,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getUserName(String userId) {
+    public UserResponse getUserByUsername(String userId) {
+        // Return the user if found, otherwise throw an exception
         User user = userRepository.getUserByUsername(userId);
-        if(user != null) {
-            return user.getUsername();
+        if (user == null) {
+            logger.error("User not found with username: {}", userId);
+            throw new RuntimeException("User not found");
         }
-        return userId;
+        // Return the user response DTO
+        return convertToUserResponse(user);
     }
 
     @Override
@@ -107,11 +108,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponse convertToUserResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getId().toString())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .build();
+        UserResponse userResponse = new UserResponse();
+        userResponse.setUsername(user.getUsername());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setFullName(user.getFullName());
+        return userResponse;
     }
 }

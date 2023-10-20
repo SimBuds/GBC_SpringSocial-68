@@ -14,8 +14,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    String getUserName(String userId);
-
+    UserResponse getUserByUsername(String userId);
     String loginUser(UserRequest userRequest);
 
     String logoutUser(UserRequest userRequest);
