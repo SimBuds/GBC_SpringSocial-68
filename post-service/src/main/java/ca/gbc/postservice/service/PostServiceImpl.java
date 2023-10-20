@@ -81,5 +81,4 @@ public class PostServiceImpl implements PostService {
                 .updatedAt(post.getUpdatedAt())
                 .build();
     }
-
 }
