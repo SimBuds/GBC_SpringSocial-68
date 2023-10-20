@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,6 +38,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public String updatePost(String postId, PostRequest postRequest) {
+
+        LocalDateTime now = LocalDateTime.now();
         log.info("Updating post: {}", postId);
 
         Query query = new Query();
@@ -47,6 +50,7 @@ public class PostServiceImpl implements PostService {
             post.setTitle(postRequest.getTitle());
             post.setContent(postRequest.getContent());
             post.setAuthorId(postRequest.getAuthorId());
+            post.setUpdatedAt(now);
 
             log.info("Post updated successfully: {}", postId);
             return postRepository.save(post).getId();

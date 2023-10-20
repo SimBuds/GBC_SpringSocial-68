@@ -30,10 +30,9 @@ CREATE TABLE comments (
 );
 
 -- Insert some data into users table
-INSERT INTO users (username, email, password, fullName) VALUES
-                    ('johnDoe', 'john.doe@example.com', 'hashedpassword123', 'John Doe'),
-                    ('janeSmith', 'jane.smith@example.com', 'hashedpassword456', 'Jane Smith'),
-                    ('timBloggs', 'tim.Bloggs@example.com', 'hashedpassword457', 'Tim Bloggs');
+INSERT INTO users (username, password, email, full_name) VALUES
+    ('user1', 'password1', 'user1@example.com', 'User One'),
+    ('user2', 'password2', 'user2@example.com', 'User Two');
 
 -- Insert some data into comments table
 INSERT INTO comments (postId, content, authorId, createdAt, updatedAt) VALUES

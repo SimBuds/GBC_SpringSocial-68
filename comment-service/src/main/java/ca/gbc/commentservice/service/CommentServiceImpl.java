@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,10 +31,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String updateComment(String commentId, CommentRequest commentRequest) {
+
+        LocalDateTime now = LocalDateTime.now();
         Comment comment = commentRepository.getById(commentId);
         comment.setPostId(commentRequest.getPostId());
         comment.setContent(commentRequest.getContent());
         comment.setAuthorId(commentRequest.getAuthorId());
+        comment.setUpdatedAt(now);
         commentRepository.save(comment);
         return comment.getId().toString();
     }
