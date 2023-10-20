@@ -7,6 +7,7 @@ import ca.gbc.commentservice.repository.CommentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,69 +16,41 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@Slf4j
+@Transactional
 public class CommentServiceImpl implements CommentService {
-
     private final CommentRepository commentRepository;
-    private final MongoTemplate mongoTemplate;
 
     @Override
     public void createComment(CommentRequest commentRequest) {
-        log.info("Creating comment: {}", commentRequest.getContent());
-
-        Comment comment = Comment.builder()
-                .postId(commentRequest.getPostId())
-                .content(commentRequest.getContent())
-                .authorId(commentRequest.getAuthorId())
-                .build();
+        Comment comment = new Comment();
+        comment.setPostId(commentRequest.getPostId());
+        comment.setContent(commentRequest.getContent());
+        comment.setAuthorId(commentRequest.getAuthorId());
         commentRepository.save(comment);
-
-        log.info("Comment created successfully: {}", commentRequest.getContent());
     }
 
     @Override
-    public String updateComment(String commentId, CommentRequest commentRequest) {
-        log.info("Updating comment: {}", commentId);
-
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(commentId));
-
-        Comment comment = mongoTemplate.findOne(query, Comment.class);
-        if (comment != null) {
-            comment.setContent(commentRequest.getContent());
-            comment.setAuthorId(commentRequest.getAuthorId());
-
-            log.info("Comment updated successfully: {}", commentId);
-            return commentRepository.save(comment).getId();
+    public void updateComment(Long commentId, CommentRequest commentRequest) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new RuntimeException("Comment not found");
         }
-
-        return commentId;
+        Comment comment = commentRepository.getById(commentId);
+        comment.setPostId(commentRequest.getPostId());
+        comment.setContent(commentRequest.getContent());
+        comment.setAuthorId(commentRequest.getAuthorId());
+        commentRepository.save(comment);
     }
 
     @Override
-    public void deleteComment(String commentId) {
-        log.info("Deleting comment {}", commentId);
+    public void deleteComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new RuntimeException("Comment not found");
+        }
         commentRepository.deleteById(commentId);
-        log.info("Comment deleted successfully: {}", commentId);
     }
 
     @Override
     public List<CommentResponse> getAllComments() {
-        log.info("Getting all comments");
-        List<Comment> comments = commentRepository.findAll();
-        return comments.stream()
-                .map(this::mapToDto)
-                .toList();
-    }
-
-    private CommentResponse mapToDto(Comment comment) {
-        return CommentResponse.builder()
-                .id(comment.getId())
-                .postId(comment.getPostId())
-                .content(comment.getContent())
-                .authorId(comment.getAuthorId())
-                .createdAt(comment.getCreatedAt())
-                .updatedAt(comment.getUpdatedAt())
-                .build();
+        return commentRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
     }
 }
