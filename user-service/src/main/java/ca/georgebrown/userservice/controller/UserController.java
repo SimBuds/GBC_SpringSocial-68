@@ -44,13 +44,12 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable String userId,
-            @Valid @RequestBody UserRequest userRequest
-    ) {
-        String updatedUsername = userService.updateUser(userId, userRequest);
-        if (updatedUsername == null) {
+            @Valid @RequestBody UserRequest userRequest) {
+        UserResponse updatedUser = userService.updateUser(userId, userRequest);
+        if (updatedUser == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new UserResponse(updatedUsername), HttpStatus.OK);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}")
@@ -61,11 +60,11 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> loginUser(@Valid @RequestBody UserRequest userRequest) {
-        String username = userService.loginUser(userRequest);
+        UserResponse username = userService.loginUser(userRequest);
         if (username == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(new UserResponse(username), HttpStatus.OK);
+        return new ResponseEntity<>(username, HttpStatus.OK);
     }
 
     @PostMapping("/logout")

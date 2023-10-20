@@ -8,14 +8,15 @@ import java.util.List;
 public interface UserService {
     void createUser(UserRequest userRequest);
 
-    String updateUser(String userId, UserRequest userRequest);
+    UserResponse updateUser(String userId, UserRequest userRequest);
 
     void deleteUser(String userId);
 
     List<UserResponse> getAllUsers();
 
-    UserResponse getUserByUsername(String userId);
-    String loginUser(UserRequest userRequest);
+    UserResponse getUserByUsername(String username);
 
-    String logoutUser(UserRequest userRequest);
+    UserResponse loginUser(UserRequest userRequest);
+
+    UserResponse logoutUser(UserRequest userRequest);
 }

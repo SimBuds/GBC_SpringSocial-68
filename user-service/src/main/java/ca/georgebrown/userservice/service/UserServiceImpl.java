@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
         // Create a new user
         User user = new User();
+        user.setId(userRequest.getId());
         user.setUsername(userRequest.getUsername());
         user.setPassword(userRequest.getPassword());
         user.setEmail(userRequest.getEmail());
@@ -41,18 +42,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String updateUser(String username, UserRequest userRequest) {
-        User user = userRepository.getUserByUsername(username);
-        if (user == null) {
+    public UserResponse updateUser(String username, UserRequest userRequest) {
+        // Check if a user with the same username already exists
+        User existingUser = userRepository.getUserByUsername(username);
+        if (existingUser == null) {
             logger.error("User not found with username: {}", username);
             throw new RuntimeException("User not found");
         }
-        user.setUsername(userRequest.getUsername());
-        user.setPassword(userRequest.getPassword());
-        user.setEmail(userRequest.getEmail());
-        user.setFullName(userRequest.getFullName());
-        userRepository.save(user);
-        return user.getUsername();
+
+        // Update the user
+        existingUser.setUsername(userRequest.getUsername());
+        existingUser.setEmail(userRequest.getEmail());
+        existingUser.setFullName(userRequest.getFullName());
+        userRepository.save(existingUser);
+        return convertToUserResponse(existingUser);
     }
 
     @Override
@@ -81,34 +84,33 @@ public class UserServiceImpl implements UserService {
             logger.error("User not found with username: {}", userId);
             throw new RuntimeException("User not found");
         }
-        // Return the user response DTO
+        // Return the username
         return convertToUserResponse(user);
     }
 
     @Override
-    public String loginUser(UserRequest userRequest) {
+    public UserResponse loginUser(UserRequest userRequest) {
         User user = userRepository.getUserByUsername(userRequest.getUsername());
         if(user != null) {
             if (userRequest.getPassword().equals(user.getPassword())) {
-                return user.getUsername();
+                return convertToUserResponse(user);
             }
         }
         return null;
     }
 
     @Override
-    public String logoutUser(UserRequest userRequest) {
+    public UserResponse logoutUser(UserRequest userRequest) {
         User user = userRepository.getUserByUsername(userRequest.getUsername());
         if(user != null) {
-            if (userRequest.getPassword().equals(user.getPassword())) {
-                return user.getUsername();
-            }
+            return convertToUserResponse(user);
         }
         return null;
     }
 
     private UserResponse convertToUserResponse(User user) {
         UserResponse userResponse = new UserResponse();
+        userResponse.setId(user.getId());
         userResponse.setUsername(user.getUsername());
         userResponse.setEmail(user.getEmail());
         userResponse.setFullName(user.getFullName());
