@@ -58,6 +58,7 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - ./init/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     restart: unless-stopped
     networks:
       - spring
