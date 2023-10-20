@@ -21,9 +21,8 @@ RUN mkdir /app
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/post-service.jar
 
 # Enviroment variables
-ENV MONGO_DB_USERNAME=mongodb \
+ENV MONGO_DB_USERNAME=mongoadmin \
     MONGO_DB_PASSWORD=mypass
-
 
 # Port
 EXPOSE 8081
