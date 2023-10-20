@@ -13,4 +13,6 @@ public interface CommentService {
     String updateComment(String commentId, CommentRequest commentRequest);
 
     void deleteComment(String commentId);
+
+    String getCommentAuthor(String commentId);
 }
