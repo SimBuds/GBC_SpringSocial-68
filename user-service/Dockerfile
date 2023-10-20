@@ -25,7 +25,7 @@ ENV ENV SPRING_DATASOURCE_USERNAME=postgres \
     ENV SPRING_DATASOURCE_PASSWORD=mypass
 
 # Port
-EXPOSE 8085
+EXPOSE 8083
 
 # Entrypoint for the container
 ENTRYPOINT ["java","-jar","/app/user-service.jar"]

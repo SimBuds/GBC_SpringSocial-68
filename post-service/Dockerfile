@@ -18,14 +18,15 @@ FROM openjdk:17-jdk-alpine
 RUN mkdir /app
 
 # Copy the jar to the production image from the builder stage.
-COPY --from=builder /home/gradle/src/build/libs/*.jar /app/user-service.jar
+COPY --from=builder /home/gradle/src/build/libs/*.jar /app/post-service.jar
 
 # Enviroment variables
-ENV ENV SPRING_DATASOURCE_USERNAME=postgres \
-    ENV SPRING_DATASOURCE_PASSWORD=mypass
+ENV MONGO_DB_USERNAME=mongodb \
+    MONGO_DB_PASSWORD=mypass
+
 
 # Port
-EXPOSE 8085
+EXPOSE 8081
 
 # Entrypoint for the container
-ENTRYPOINT ["java","-jar","/app/user-service.jar"]
+ENTRYPOINT ["java","-jar","/app/post-service.jar"]

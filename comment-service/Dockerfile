@@ -18,14 +18,14 @@ FROM openjdk:17-jdk-alpine
 RUN mkdir /app
 
 # Copy the jar to the production image from the builder stage.
-COPY --from=builder /home/gradle/src/build/libs/*.jar /app/user-service.jar
+COPY --from=builder /home/gradle/src/build/libs/*.jar /app/comment-service.jar
 
 # Enviroment variables
 ENV ENV SPRING_DATASOURCE_USERNAME=postgres \
     ENV SPRING_DATASOURCE_PASSWORD=mypass
 
 # Port
-EXPOSE 8086
+EXPOSE 8082
 
 # Entrypoint for the container
-ENTRYPOINT ["java","-jar","/app/user-service.jar"]
+ENTRYPOINT ["java","-jar","/app/comment-service.jar"]
