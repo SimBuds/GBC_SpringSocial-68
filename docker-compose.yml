@@ -2,6 +2,53 @@ version: "3.8"
 
 services:
 
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+    networks:
+      - spring
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=mypass
+      - MONGO_INITDB_DATABASE=SpringSocialMongo
+    volumes:
+      - ./data/mongo/posts:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+    command: mongod --auth
+    networks:
+      - spring
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8080:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongoadmin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=mypass
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    container_name: mongo-express-gbc
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
   post-service:
     image: post-service
     ports:
@@ -44,53 +91,6 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - postgres
-    networks:
-      - spring
-
-  postgres:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
-    container_name: postgres
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mypass
-      - POSTGRES_DB=servicesdb
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-      - ./init/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    restart: unless-stopped
-    networks:
-      - spring
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    container_name: mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=mypass
-    volumes:
-      - ./data/mongo/posts:/data/db
-      - ./init/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    restart: unless-stopped
-    command: mongod --auth
-    networks:
-      - spring
-
-  mongo-express:
-    image: mongo-express
-    ports:
-      - "8080:8081"
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongoadmin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=mypass
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    container_name: mongo-express-gbc
-    restart: unless-stopped
-    depends_on:
-      - mongodb
     networks:
       - spring
 

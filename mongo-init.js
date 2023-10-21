@@ -1,23 +1,30 @@
 // log the start of script execution
 print('START');
 
-// mongo-init.js
+// This will create a new database or switch to it if it already exists
+db = db.getSiblingDB('SpringSocialMongo');
 
+// Create a user with readWrite permissions on the SpringSocialMongo database
 db.createUser({
     user: "mongoadmin",
     pwd: "mypass",
     roles: [
         {
             role: "readWrite",
-            db: "testdb"
+            db: "SpringSocialMongo"
         }
     ]
 });
 
-// Use the database
-db = db.getSiblingDB('SpringSocialMongo');
+// Create the 'post' collection if it doesn't exist, as it will be used below
+db.createCollection('post');
 
-// Insert sample posts
+// Define a function to get the current date and time
+function NOW() {
+    return new Date();
+}
+
+// Insert sample posts into the 'post' collection
 db.post.insertMany([
     {
         "title": "Sample Post 1",
@@ -36,4 +43,4 @@ db.post.insertMany([
 ]);
 
 // log the end of script execution
-print('END')
+print('END');
