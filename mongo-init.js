@@ -17,7 +17,7 @@ db.createUser({
 });
 
 // Create the 'post' collection if it doesn't exist, as it will be used below
-db.createCollection('post');
+db.createCollection('postdb');
 
 // Define a function to get the current date and time
 function NOW() {

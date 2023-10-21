@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +29,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String updateComment(String commentId, CommentRequest commentRequest) {
-
+    public String updateComment(Long commentId, CommentRequest commentRequest) {
         LocalDateTime now = LocalDateTime.now();
-        Comment comment = commentRepository.getById(commentId);
+        Comment comment = commentRepository.getById(commentId); // Changed here
         comment.setPostId(commentRequest.getPostId());
         comment.setContent(commentRequest.getContent());
         comment.setAuthorId(commentRequest.getAuthorId());
@@ -43,8 +41,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(String commentId) {
-        commentRepository.deleteById(commentId);
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId); // Changed here
     }
 
     @Override
@@ -53,8 +51,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String getCommentById(String commentId) {
-        Comment comment = commentRepository.getById(commentId);
+    public String getCommentById(Long commentId) {
+        Comment comment = commentRepository.getById(commentId); // Changed here
         return comment.getAuthorId();
     }
 

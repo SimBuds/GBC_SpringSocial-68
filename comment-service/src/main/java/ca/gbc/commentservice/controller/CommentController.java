@@ -32,20 +32,22 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable("commentId") String commentId,
             @RequestBody CommentRequest commentRequest) {
-        String updatedCommentId = commentService.updateComment(commentId, commentRequest);
+        Long commentIdLong = Long.parseLong(commentId);
+        commentService.updateComment(commentIdLong, commentRequest);
+
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Location", "/api/comments/" + updatedCommentId);
+        httpHeaders.add("Location", "/api/comments/" + commentId);
         return new ResponseEntity<>(httpHeaders, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<?> getCommentById(@PathVariable("commentId") String commentId) {
+    public ResponseEntity<?> getCommentById(@PathVariable("commentId") Long commentId) {
         String commentAuthorId = commentService.getCommentById(commentId);
         return new ResponseEntity<>(commentAuthorId, HttpStatus.OK);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable("commentId") String commentId) {
+    public ResponseEntity<?> deleteComment(@PathVariable("commentId") Long commentId) {
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

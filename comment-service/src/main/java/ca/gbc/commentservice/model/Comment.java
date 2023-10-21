@@ -26,13 +26,13 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "post_id", nullable = false)
     private String postId;
 
     @Size(max = 250)
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "author_id", nullable = false)
     private String authorId;
 
     @CreatedDate

@@ -43,5 +43,6 @@ public class User {
     private String email;
 
     @Size(max = 100)
+    @Column(name = "fullName")
     private String fullName;
 }
