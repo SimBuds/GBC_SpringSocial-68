@@ -1,10 +1,11 @@
--- Start a transaction
-BEGIN;
-
+-- Create the database separately
 CREATE DATABASE servicesdb;
 
 -- Connect to the database
 \c servicesdb;
+
+-- The rest of the commands can be in a transaction
+BEGIN;
 
 -- Create the user
 CREATE USER myuser WITH PASSWORD 'mypass';
@@ -18,23 +19,17 @@ CREATE TABLE IF NOT EXISTS users (
                                      username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(120) NOT NULL, -- Consider hashing the password
     email VARCHAR(50) UNIQUE NOT NULL,
-    full_name VARCHAR(100) -- Changed to snake_case
+    full_name VARCHAR(100)
     );
 
 CREATE TABLE IF NOT EXISTS comments (
                                         id SERIAL PRIMARY KEY,
-                                        post_id VARCHAR(255) NOT NULL, -- Changed to snake_case
+                                        post_id VARCHAR(255) NOT NULL,
     content VARCHAR(250),
-    author_id VARCHAR(255) NOT NULL, -- Changed to snake_case
-    created_at TIMESTAMP, -- Changed to snake_case
-    updated_at TIMESTAMP -- Changed to snake_case
+    author_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     );
-
--- Update comments to set default values for null columns (if any exist)
-UPDATE comments SET author_id = 'default' WHERE author_id IS NULL; -- Changed to snake_case
-UPDATE comments SET post_id = 'default' WHERE post_id IS NULL; -- Changed to snake_case
-ALTER TABLE comments RENAME COLUMN authorid TO author_id;
-ALTER TABLE comments RENAME COLUMN postid TO post_id;
 
 -- Insert some data into users table
 INSERT INTO users (username, password, email, full_name)
