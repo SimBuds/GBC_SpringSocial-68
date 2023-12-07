@@ -1,8 +1,8 @@
 -- Create the database separately
-CREATE DATABASE servicesdb;
+CREATE DATABASE commentdb;
 
 -- Connect to the database
-\c servicesdb;
+\c commentdb;
 
 -- The rest of the commands can be in a transaction
 BEGIN;
@@ -11,17 +11,9 @@ BEGIN;
 CREATE USER myuser WITH PASSWORD 'mypass';
 
 -- Grant privileges to the user
-GRANT ALL PRIVILEGES ON DATABASE servicesdb TO myuser;
+GRANT ALL PRIVILEGES ON DATABASE commentdb TO myuser;
 
 -- Create the tables
-CREATE TABLE IF NOT EXISTS users (
-                                     id SERIAL PRIMARY KEY,
-                                     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(120) NOT NULL, -- Consider hashing the password
-    email VARCHAR(50) UNIQUE NOT NULL,
-    full_name VARCHAR(100)
-    );
-
 CREATE TABLE IF NOT EXISTS comments (
                                         id SERIAL PRIMARY KEY,
                                         post_id VARCHAR(255) NOT NULL,
@@ -30,12 +22,6 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at TIMESTAMP,
     updated_at TIMESTAMP
     );
-
--- Insert some data into users table
-INSERT INTO users (username, password, email, full_name)
-VALUES
-    ('user1', 'password1', 'user1@example.com', 'Casey Hsu'),
-    ('user2', 'password2', 'user2@example.com', 'Matt Price');
 
 -- Insert some data into comments table
 INSERT INTO comments (post_id, content, author_id, created_at, updated_at)

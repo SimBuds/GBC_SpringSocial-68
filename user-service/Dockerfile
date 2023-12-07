@@ -22,7 +22,7 @@ COPY --from=builder /home/gradle/src/build/libs/*.jar /app/user-service.jar
 
 # Enviroment variables
 ENV ENV SPRING_DATASOURCE_USERNAME=postgres \
-    ENV SPRING_DATASOURCE_PASSWORD=mypass
+    ENV SPRING_DATASOURCE_PASSWORD=password
 
 # Port
 EXPOSE 8083

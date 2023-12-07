@@ -2,17 +2,44 @@ version: "3.8"
 
 services:
 
-  postgres:
+  postgres-user:
     image: postgres:latest
     ports:
       - "5432:5432"
-    container_name: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mypass
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./data/postgres-user:/var/lib/postgresql/data
+      - ./init/postgres/user-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-user
+    restart: unless-stopped
+    networks:
+      - spring
+
+  postgres-comment:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres-comment:/var/lib/postgresql/data
+      - ./init/postgres/comment-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-comment
+    restart: unless-stopped
+    networks:
+      - spring
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.ca
+      PGADMIN_DEFAULT_PASSWORD: password
+    container_name: pgadmin
     restart: unless-stopped
     networks:
       - spring
@@ -21,14 +48,14 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-    container_name: mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongoadmin
       - MONGO_INITDB_ROOT_PASSWORD=mypass
       - MONGO_INITDB_DATABASE=SpringSocialMongo
     volumes:
       - ./data/mongo/SpringSocialMongo:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./init/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    container_name: mongodb
     restart: unless-stopped
     command: mongod --auth
     networks:
@@ -59,6 +86,7 @@ services:
     container_name: post-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
     depends_on:
       - mongodb
     networks:
@@ -74,8 +102,9 @@ services:
     container_name: comment-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
     depends_on:
-      - postgres
+      - postgres-comment
     networks:
       - spring
 
@@ -89,8 +118,9 @@ services:
     container_name: user-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
     depends_on:
-      - postgres
+      - postgres-user
     networks:
       - spring
 
