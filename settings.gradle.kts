@@ -1,2 +1,2 @@
-rootProject.name = "GBC_SpringSocial-68"
-include("comment-service", "post-service", "user-service")
+rootProject.name = "SpringSocial"
+include("comment-service", "post-service", "user-service", "friend-service")
