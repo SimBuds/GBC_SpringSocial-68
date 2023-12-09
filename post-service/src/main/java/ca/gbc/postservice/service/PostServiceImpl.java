@@ -2,7 +2,7 @@ package ca.gbc.postservice.service;
 
 import ca.gbc.postservice.dto.PostRequest;
 import ca.gbc.postservice.dto.PostResponse;
-import ca.gbc.postservice.dto.UserResponse;
+import ca.gbc.postservice.dto.UserRequest;
 import ca.gbc.postservice.model.Post;
 import ca.gbc.postservice.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,12 +77,12 @@ public class PostServiceImpl implements PostService {
     }
 
 
-    private PostResponse mapToDto(Post post, UserResponse userResponse) {
+    private PostResponse mapToDto(Post post, UserRequest userResponse) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .authorId(userResponse.getFullName())
+                .authorId(userResponse.getUsername())
                 .build();
     }
 }

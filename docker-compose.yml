@@ -2,6 +2,19 @@ version: "3.8"
 
 services:
 
+  discovery-service:
+    image: discovery-service
+    ports:
+      - "8761:8761"
+    build:
+      context: ./discovery-service
+      dockerfile: ./Dockerfile
+    container_name: discovery-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - spring
+
   postgres-user:
     image: postgres:latest
     ports:
@@ -27,6 +40,21 @@ services:
     volumes:
       - ./data/postgres-comment:/var/lib/postgresql/data
       - ./init/postgres/comment-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-comment
+    restart: unless-stopped
+    networks:
+      - spring
+
+  postgres-friend:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres-friend:/var/lib/postgresql/data
+      - ./init/postgres/friend-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     container_name: postgres-comment
     restart: unless-stopped
     networks:
@@ -121,6 +149,22 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres-user
+    networks:
+      - spring
+
+  friend-service:
+    image: friend-service
+    ports:
+      - "8084:8084"
+    build:
+      context: ./friend-service
+      dockerfile: ./Dockerfile
+    container_name: friend-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+    depends_on:
+      - postgres-friend
     networks:
       - spring
 

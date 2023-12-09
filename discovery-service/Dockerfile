@@ -18,14 +18,10 @@ FROM openjdk:17-jdk-alpine
 RUN mkdir /app
 
 # Copy the jar to the production image from the builder stage.
-COPY --from=builder /home/gradle/src/build/libs/*.jar /app/friend-service.jar
+COPY --from=builder /home/gradle/src/build/libs/*.jar /app/discovery-service.jar
 
-# Enviroment variables
-ENV ENV SPRING_DATASOURCE_USERNAME=postgres \
-    ENV SPRING_DATASOURCE_PASSWORD=mypass
-
-# Port
-EXPOSE 8082
+# Port for the container
+EXPOSE 8761
 
 # Entrypoint for the container
-ENTRYPOINT ["java","-jar","/app/friend-service.jar"]
+ENTRYPOINT ["java","-jar","/app/discovery-service.jar"]
