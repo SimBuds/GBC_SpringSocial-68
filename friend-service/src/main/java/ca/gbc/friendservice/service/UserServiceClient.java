@@ -1,6 +1,6 @@
 package ca.gbc.friendservice.service;
 
-import ca.gbc.friendservice.model.UserRequest;
+import ca.gbc.friendservice.dto.UserRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;

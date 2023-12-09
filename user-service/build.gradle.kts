@@ -36,6 +36,7 @@ dependencies {
     implementation ("org.testcontainers:mockserver:1.18.1")
     implementation ("org.testcontainers:postgresql:1.18.1")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.1.0")
 }
 
 tasks.withType<Test> {
