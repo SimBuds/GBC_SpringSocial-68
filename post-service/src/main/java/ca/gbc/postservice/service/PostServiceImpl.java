@@ -2,6 +2,7 @@ package ca.gbc.postservice.service;
 
 import ca.gbc.postservice.dto.PostRequest;
 import ca.gbc.postservice.dto.PostResponse;
+import ca.gbc.postservice.dto.UserResponse;
 import ca.gbc.postservice.model.Post;
 import ca.gbc.postservice.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final MongoTemplate mongoTemplate;
+    private final UserServiceClient userServiceClient;
 
     @Override
     public void createPost(PostRequest postRequest) {
@@ -67,22 +69,20 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> getAllPosts() {
+    public Flux<PostResponse> getAllPosts() {
         log.info("Getting all posts");
-        List<Post> posts = postRepository.findAll();
-        return posts.stream()
-                .map(this::mapToDto)
-                .toList();
+        return Flux.fromIterable(postRepository.findAll())
+                .flatMap(post -> userServiceClient.getUserById(post.getAuthorId())
+                        .map(userResponse -> mapToDto(post, userResponse)));
     }
 
-    private PostResponse mapToDto(Post post) {
+
+    private PostResponse mapToDto(Post post, UserResponse userResponse) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .authorId(post.getAuthorId())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
+                .authorId(userResponse.getFullName())
                 .build();
     }
 }
