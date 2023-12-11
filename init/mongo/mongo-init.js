@@ -29,14 +29,14 @@ db.post.insertMany([
     {
         "title": "Sample Post 1",
         "content": "This is the content of the first sample post.",
-        "authorId": "author123",
+        "authorId": "user1",
         "createdAt": NOW(),
         "updatedAt": NOW()
     },
     {
         "title": "Sample Post 2",
         "content": "This is the content of the second sample post.",
-        "authorId": "author124",
+        "authorId": "user2",
         "createdAt": NOW(),
         "updatedAt": NOW()
     }

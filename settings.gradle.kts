@@ -1,2 +1,2 @@
 rootProject.name = "SpringSocial"
-include("comment-service", "post-service", "user-service", "friend-service", "discovery-service")
+include("comment-service", "post-service", "user-service", "friend-service", "discovery-service", "api-gateway")
