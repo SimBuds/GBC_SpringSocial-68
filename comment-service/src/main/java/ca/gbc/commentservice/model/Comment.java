@@ -1,9 +1,6 @@
 package ca.gbc.commentservice.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +26,7 @@ public class Comment {
     @Column(name = "post_id", nullable = false)
     private String postId;
 
-    @Size(max = 250)
+    @Column(name = "content", nullable = false)
     private String content;
 
     @Column(name = "author_id", nullable = false)

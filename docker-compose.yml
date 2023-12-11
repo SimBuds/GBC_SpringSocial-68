@@ -55,19 +55,7 @@ services:
     volumes:
       - ./data/postgres-friend:/var/lib/postgresql/data
       - ./init/postgres/friend-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    container_name: postgres-comment
-    restart: unless-stopped
-    networks:
-      - spring
-
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - "8888:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user@domain.ca
-      PGADMIN_DEFAULT_PASSWORD: password
-    container_name: pgadmin
+    container_name: postgres-friend
     restart: unless-stopped
     networks:
       - spring
@@ -89,18 +77,19 @@ services:
     networks:
       - spring
 
-  mongo-express:
-    image: mongo-express
+  friend-service:
+    image: friend-service
     ports:
-      - "8080:8081"
+      - "8084:8084"
+    build:
+      context: ./friend-service
+      dockerfile: ./Dockerfile
+    container_name: friend-service
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongoadmin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=mypass
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    container_name: mongo-express-gbc
+      SPRING_PROFILES_ACTIVE: docker
     restart: unless-stopped
     depends_on:
-      - mongodb
+      - postgres-friend
     networks:
       - spring
 
@@ -149,22 +138,6 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres-user
-    networks:
-      - spring
-
-  friend-service:
-    image: friend-service
-    ports:
-      - "8084:8084"
-    build:
-      context: ./friend-service
-      dockerfile: ./Dockerfile
-    container_name: friend-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    restart: unless-stopped
-    depends_on:
-      - postgres-friend
     networks:
       - spring
 

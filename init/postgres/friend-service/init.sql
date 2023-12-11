@@ -23,22 +23,6 @@ CREATE TABLE IF NOT EXISTS friends (
     updated_at TIMESTAMP DEFAULT NOW()     -- Timestamp of the last update
     );
 
--- Assuming you have a separate users table, you would create it as well
-CREATE TABLE IF NOT EXISTS users (
-                                     user_id VARCHAR(255) PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    full_name VARCHAR(255) NOT NULL
-    -- Additional fields as necessary
-    );
-
--- Insert some sample data into the users table (if needed)
-INSERT INTO users (user_id, username, password, email, full_name)
-VALUES
-    ('user1', 'john_doe', 'password123', 'john.doe@example.com', 'John Doe'),
-    ('user2', 'jane_doe', 'password456', 'jane.doe@example.com', 'Jane Doe');
-
 -- Insert some sample data into the friends table
 INSERT INTO friends (user_id, friend_id, status)
 VALUES

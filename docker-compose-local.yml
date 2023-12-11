@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+
+  postgres-user:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres-user:/var/lib/postgresql/data
+      - ./init/postgres/user-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-user
+    restart: unless-stopped
+
+  postgres-comment:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres-comment:/var/lib/postgresql/data
+      - ./init/postgres/comment-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-comment
+    restart: unless-stopped
+
+  postgres-friend:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypass
+    volumes:
+      - ./data/postgres-friend:/var/lib/postgresql/data
+      - ./init/postgres/friend-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    container_name: postgres-friend
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=mypass
+      - MONGO_INITDB_DATABASE=SpringSocialMongo
+    volumes:
+      - ./data/mongo/SpringSocialMongo:/data/db
+      - ./init/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --auth
