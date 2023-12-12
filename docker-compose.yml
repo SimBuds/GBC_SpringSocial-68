@@ -25,6 +25,7 @@ services:
     container_name: api-gateway
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     depends_on:
       - discovery-service
     restart: unless-stopped
@@ -103,9 +104,11 @@ services:
     container_name: post-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     restart: unless-stopped
     depends_on:
       - mongodb
+      - discovery-service
     networks:
       - spring
 
@@ -119,9 +122,11 @@ services:
     container_name: comment-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     restart: unless-stopped
     depends_on:
       - postgres-comment
+      - discovery-service
     networks:
       - spring
 
@@ -135,9 +140,11 @@ services:
     container_name: user-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     restart: unless-stopped
     depends_on:
       - postgres-user
+      - discovery-service
     networks:
       - spring
 
@@ -151,9 +158,11 @@ services:
     container_name: friend-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     restart: unless-stopped
     depends_on:
       - postgres-friend
+      - discovery-service
     networks:
       - spring
 

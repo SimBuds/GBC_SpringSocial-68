@@ -15,11 +15,8 @@ public class UserServiceClient {
 
     public Mono<UserRequest> getUserDetails(String userId) {
         return webClient.get()
-                .uri("/users/" + userId)
+                .uri("/api/users/" + userId)
                 .retrieve()
                 .bodyToMono(UserRequest.class);
     }
-
-
 }
-
