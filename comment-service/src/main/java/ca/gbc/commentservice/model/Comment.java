@@ -1,15 +1,17 @@
 package ca.gbc.commentservice.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
-@Table("comments")
+@Entity
+@Table(name = "comments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,13 +21,13 @@ public class Comment {
     @Id
     private Long id;
 
-    @Column("post_id")
+    @Column(name = "post_id")
     private String postId;
 
-    @Column("content")
+    @Column(name = "content")
     private String content;
 
-    @Column("author_id")
+    @Column(name = "author_id")
     private String authorId;
 
     private LocalDateTime createdAt;

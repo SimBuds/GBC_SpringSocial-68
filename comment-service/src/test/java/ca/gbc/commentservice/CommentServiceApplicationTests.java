@@ -36,9 +36,6 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 	@MockBean
 	private CommentRepository commentRepository;
 
-	@Autowired
-	private CommentService commentService;
-
 	CommentRequest getCommentRequest() {
 		return CommentRequest.builder()
 				.postId("somePostId")
