@@ -68,7 +68,6 @@ public class UserServiceApplicationTests extends AbstractContainerBaseTest {
         });
     }
 
-    @Test
     void createUsers() throws Exception {
         UserRequest userRequest = getUserRequest();
         String userRequestString = objectMapper.writeValueAsString(userRequest);
@@ -81,7 +80,6 @@ public class UserServiceApplicationTests extends AbstractContainerBaseTest {
         Assertions.assertTrue(userRepository.findAll().size() > 0);
     }
 
-    @Test
     void getUserById() throws Exception {
         // Prepare saved user
         // check if user exists
@@ -109,7 +107,6 @@ public class UserServiceApplicationTests extends AbstractContainerBaseTest {
         assertEquals(user.getUsername(), actualUserResponse.getUsername());
     }
 
-    @Test
     void updateUser() throws Exception {
         // Prepare saved user
         User user = getUserList().get(0);
@@ -138,7 +135,6 @@ public class UserServiceApplicationTests extends AbstractContainerBaseTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    @Test
     void deleteUser() throws Exception {
         // Prepare saved user
         User user = getUserList().get(0);

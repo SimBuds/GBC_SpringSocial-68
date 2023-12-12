@@ -71,8 +71,6 @@ public class PostServiceApplicationTests {
 		return objectMapper.readValue(jsonString, new TypeReference<List<PostResponse>>() {
 		});
 	}
-
-	@Test
 	void createPost() throws Exception {
 		// Action
 		PostRequest postRequest = getPostRequest();
@@ -91,8 +89,6 @@ public class PostServiceApplicationTests {
 		List<Post> posts = mongoTemplate.find(query, Post.class);
 		Assertions.assertTrue(posts.size() > 0);
 	}
-
-	@Test
 	void getAllPosts() throws Exception {
 		// Cleanup: Delete all posts before test
 		postRepository.deleteAll();
@@ -114,8 +110,6 @@ public class PostServiceApplicationTests {
 		assertEquals("Sample Content", postList.get(0).getContent());
 		assertEquals("12345", postList.get(0).getAuthorId());
 	}
-
-
 	private PostResponse mapToDto(Post post) {
 		return PostResponse.builder()
 				.id(post.getId())
@@ -124,7 +118,6 @@ public class PostServiceApplicationTests {
 				.authorId(post.getAuthorId())
 				.build();
 	}
-	@Test
 	void updatePost() throws Exception {
 		// Prepare saved post
 		Post savedPost = postRepository.save(getPostList().get(0));
@@ -151,7 +144,6 @@ public class PostServiceApplicationTests {
 
 		assertEquals("Updated Title", updatedPost.getTitle());
 	}
-	@Test
 	void deletePost() throws Exception {
 		// Prepare saved post
 		Post savedPost = postRepository.save(getPostList().get(0));

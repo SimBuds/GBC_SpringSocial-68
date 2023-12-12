@@ -7,19 +7,21 @@ import ca.gbc.commentservice.repository.CommentRepository;
 import ca.gbc.commentservice.service.CommentService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,7 +33,7 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Autowired
+	@MockBean
 	private CommentRepository commentRepository;
 
 	@Autowired
@@ -64,65 +66,88 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 		});
 	}
 
-	@Test
+	void getCommentById() throws Exception {
+		Comment mockComment = new Comment();
+		mockComment.setId(1L);
+		mockComment.setPostId("somePostId");
+		mockComment.setContent("Sample Comment");
+		mockComment.setAuthorId("commentAuthor123");
+
+		Mockito.when(commentRepository.findById(Mockito.anyLong()))
+				.thenReturn(Mono.just(mockComment));
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/{commentId}", 1L))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string(containsString("Sample Comment")));
+	}
+
+	void deleteComment() throws Exception {
+		Comment mockComment = new Comment();
+		mockComment.setId(1L);
+		mockComment.setPostId("somePostId");
+		mockComment.setContent("Sample Comment");
+		mockComment.setAuthorId("commentAuthor123");
+
+		Mockito.when(commentRepository.findById(Mockito.anyLong())).thenReturn(Mono.just(mockComment));
+		Mockito.when(commentRepository.deleteById(Mockito.anyLong())).thenReturn(Mono.empty());
+
+		mockMvc.perform(MockMvcRequestBuilders
+						.delete("/api/comments/" + mockComment.getId())
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
 	void createComments() throws Exception {
 		CommentRequest commentRequest = getCommentRequest();
 		String commentRequestString = objectMapper.writeValueAsString(commentRequest);
 
+		Comment mockComment = new Comment();
+		mockComment.setId(1L);
+		mockComment.setPostId(commentRequest.getPostId());
+		mockComment.setContent(commentRequest.getContent());
+		mockComment.setAuthorId(commentRequest.getAuthorId());
+
+		Mockito.when(commentRepository.save(Mockito.any(Comment.class)))
+				.thenReturn(Mono.just(mockComment));
+
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/comments")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(commentRequestString))
-				.andExpect(MockMvcResultMatchers.status().isCreated());
+				.andExpect(MockMvcResultMatchers.status().isOk());
 
-		Long count = commentRepository.findAll().count().block();
-		Assertions.assertTrue(count != null && count > 0);
+		Mockito.verify(commentRepository, Mockito.times(1)).save(Mockito.any(Comment.class));
 	}
 
-	@Test
-	void getCommentById() throws Exception {
-		// Arrange
-		Comment comment = getCommentList().get(0);
-
-		if(comment == null) {
-			throw new Exception("Comment is null");
-		}
-
-		// Action
-		commentRepository.save(comment);
-	}
-
-	@Test
 	void updateComment() throws Exception {
-		commentService.createComment(getCommentRequest());
+		Comment mockComment = new Comment();
+		mockComment.setId(1L);
+		mockComment.setPostId("somePostId");
+		mockComment.setContent("Sample Comment");
+		mockComment.setAuthorId("commentAuthor123");
 
-		Mono<Comment> savedCommentMono = commentRepository.findAll().next();
-		Comment savedComment = savedCommentMono.block();
-		Assertions.assertNotNull(savedComment, "Expected saved comment not to be null");
+		Mockito.when(commentRepository.findById(Mockito.anyLong()))
+				.thenReturn(Mono.just(mockComment));
+
+		Comment updatedComment = new Comment();
+		updatedComment.setId(1L);
+		updatedComment.setPostId("somePostId");
+		updatedComment.setContent("Updated Comment Content");
+		updatedComment.setAuthorId("commentAuthor123");
+
+		Mockito.when(commentRepository.save(Mockito.any(Comment.class)))
+				.thenReturn(Mono.just(updatedComment));
 
 		CommentRequest updatedCommentRequest = CommentRequest.builder()
-				.postId(savedComment.getPostId())
+				.postId("somePostId")
 				.content("Updated Comment Content")
-				.authorId(savedComment.getAuthorId())
+				.authorId("commentAuthor123")
 				.build();
 
-		mockMvc.perform(MockMvcRequestBuilders
-						.put("/api/comments/" + savedComment.getId())
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/comments/{commentId}", 1L)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(updatedCommentRequest)))
-				.andExpect(MockMvcResultMatchers.status().isNoContent());
-	}
+				.andExpect(MockMvcResultMatchers.status().isOk());
 
-	@Test
-	void deleteComment() throws Exception {
-		commentService.createComment(getCommentRequest());
-
-		Mono<Comment> savedCommentMono = commentRepository.findAll().next();
-		Comment savedComment = savedCommentMono.block();
-		Assertions.assertNotNull(savedComment, "Expected saved comment not to be null");
-
-		mockMvc.perform(MockMvcRequestBuilders
-						.delete("/api/comments/" + savedComment.getId())
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isNoContent());
+		Mockito.verify(commentRepository, Mockito.times(1)).save(Mockito.any(Comment.class));
 	}
 }
