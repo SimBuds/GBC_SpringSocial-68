@@ -1,4 +1,4 @@
-package ca.gbc.postservice.service;
+package ca.gbc.postservice.config;
 
 import ca.gbc.postservice.dto.CommentResponse;
 import org.slf4j.Logger;
@@ -9,17 +9,16 @@ import reactor.core.publisher.Flux;
 
 @Service
 public class CommentServiceClient {
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceClient.class);
 
     public CommentServiceClient(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
+        this.webClient = webClientBuilder.baseUrl("http://comment-service:8082").build();
     }
 
-    public Flux<CommentResponse> getCommentsByPostId(Long postId) {
-        return webClientBuilder.build()
-                .get()
-                .uri("http://comment-service:8082/api/comments/post/" + postId)
+    public Flux<CommentResponse> getCommentsByPostId(String postId) {
+        return webClient.get()
+                .uri("/api/comments/post/" + postId)
                 .retrieve()
                 .bodyToFlux(CommentResponse.class)
                 .doOnError(error -> LOGGER.error("Error while calling comment-service: {}", error.getMessage()));

@@ -79,9 +79,9 @@ public class CommentServiceImpl implements CommentService {
                 .flatMap(optionalComment -> {
                     if (optionalComment.isPresent()) {
                         commentRepository.delete(optionalComment.get());
-                        return Mono.just(ResponseEntity.ok().<Void>build()); // Use ResponseEntity.ok()
+                        return Mono.just(ResponseEntity.ok().<Void>build());
                     } else {
-                        return Mono.just(ResponseEntity.notFound().build()); // Use ResponseEntity.notFound()
+                        return Mono.just(ResponseEntity.notFound().build());
                     }
                 });
     }
@@ -105,6 +105,13 @@ public class CommentServiceImpl implements CommentService {
                 })
                 .subscribeOn(Schedulers.boundedElastic())
                 .map(this::mapToDto);
+    }
+
+    @Override
+    public Flux<CommentResponse> getCommentsByPostId(String postId) {
+        return commentRepository.findByPostId(postId)
+                .map(this::mapToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private CommentResponse mapToDto(Comment comment) {

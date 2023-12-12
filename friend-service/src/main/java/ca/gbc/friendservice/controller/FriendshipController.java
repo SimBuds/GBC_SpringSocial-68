@@ -4,6 +4,7 @@ import ca.gbc.friendservice.service.FriendshipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/friendship")
@@ -38,7 +39,7 @@ public class FriendshipController {
 
     @GetMapping("/status")
     public ResponseEntity<?> getFriendshipStatus(@RequestParam String userId, @RequestParam String friendId) {
-        String status = friendshipService.getFriendshipStatus(userId, friendId);
+        Mono<String> status = friendshipService.getFriendshipStatus(userId, friendId);
         return ResponseEntity.ok("Friendship status: " + status);
     }
 }

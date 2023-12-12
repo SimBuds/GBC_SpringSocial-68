@@ -1,5 +1,6 @@
 package ca.gbc.friendservice.service;
 
+import ca.gbc.friendservice.config.UserServiceClient;
 import ca.gbc.friendservice.model.Friendship;
 import ca.gbc.friendservice.model.FriendshipStatus;
 import ca.gbc.friendservice.repository.FriendshipRepository;
@@ -14,52 +15,74 @@ import reactor.core.publisher.Mono;
 public class FriendshipServiceImpl implements FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
+    private final UserServiceClient userServiceClient;
 
     @Override
     public Mono<Void> createFriendship(String userId, String friendId) {
-        return Mono.fromCallable(() -> {
-            Friendship friendship = new Friendship();
-            friendship.setUserId(userId);
-            friendship.setFriendId(friendId);
-            friendship.setStatus(FriendshipStatus.PENDING);
-            Friendship created = friendshipRepository.save(friendship);
-            log.info("Friendship request from {} to {}.", userId, friendId);
-            return created;
-        }).then();
+        return userServiceClient.getUserDetails(userId)
+                .flatMap(user -> userServiceClient.getUserDetails(friendId))
+                .flatMap(user -> Mono.fromCallable(() -> {
+                    Friendship friendship = new Friendship();
+                    friendship.setUserId(userId);
+                    friendship.setFriendId(friendId);
+                    friendship.setStatus(FriendshipStatus.PENDING);
+                    Friendship created = friendshipRepository.save(friendship);
+                    log.info("Friendship request from {} to {}.", userId, friendId);
+                    return created;
+                }))
+                .then();
     }
 
     @Override
-    public void acceptFriendship(String userId, String friendId) {
-        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(friendId, userId)
-                .orElseThrow(() -> new RuntimeException("Friendship request not found"));
-        friendship.setStatus(FriendshipStatus.ACCEPTED);
-        friendshipRepository.save(friendship);
-        log.info("Friendship accepted between {} and {}.", userId, friendId);
-    }
-
-
-    @Override
-    public void rejectFriendship(String userId, String friendId) {
-        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(friendId, userId)
-                .orElseThrow(() -> new RuntimeException("Friendship request not found"));
-        friendship.setStatus(FriendshipStatus.REJECTED);
-        friendshipRepository.save(friendship);
-        log.info("Friendship between {} and {} has been rejected.", userId, friendId);
+    public Mono<Void> acceptFriendship(String userId, String friendId) {
+        return Mono.fromCallable(() ->
+                        friendshipRepository.findByUserIdAndFriendId(friendId, userId)
+                                .orElseThrow(() -> new RuntimeException("Friendship request not found"))
+                )
+                .map(friendship -> {
+                    friendship.setStatus(FriendshipStatus.ACCEPTED);
+                    friendshipRepository.save(friendship);
+                    log.info("Friendship accepted between {} and {}.", userId, friendId);
+                    return friendship;
+                })
+                .then();
     }
 
     @Override
-    public void deleteFriendship(String userId, String friendId) {
-        Friendship friendship = friendshipRepository.findByUserIdAndFriendId(userId, friendId)
-                .orElseThrow(() -> new RuntimeException("Friendship not found"));
-        friendshipRepository.delete(friendship);
-        log.info("Friendship between {} and {} has been deleted.", userId, friendId);
+    public Mono<Void> rejectFriendship(String userId, String friendId) {
+        return Mono.fromCallable(() ->
+                        friendshipRepository.findByUserIdAndFriendId(friendId, userId)
+                                .orElseThrow(() -> new RuntimeException("Friendship request not found"))
+                )
+                .map(friendship -> {
+                    friendship.setStatus(FriendshipStatus.REJECTED);
+                    friendshipRepository.save(friendship);
+                    log.info("Friendship between {} and {} has been rejected.", userId, friendId);
+                    return friendship;
+                })
+                .then();
     }
 
     @Override
-    public String getFriendshipStatus(String userId, String friendId) {
-        return friendshipRepository.findByUserIdAndFriendId(userId, friendId)
-                .map(Friendship::getStatus)
-                .map(Enum::name)
-                .orElse("Not a friend");
+    public Mono<Void> deleteFriendship(String userId, String friendId) {
+        return Mono.fromCallable(() ->
+                        friendshipRepository.findByUserIdAndFriendId(userId, friendId)
+                                .orElseThrow(() -> new RuntimeException("Friendship not found"))
+                )
+                .doOnSuccess(friendship -> {
+                    friendshipRepository.delete(friendship);
+                    log.info("Friendship between {} and {} has been deleted.", userId, friendId);
+                })
+                .then();
+    }
+
+    @Override
+    public Mono<String> getFriendshipStatus(String userId, String friendId) {
+        return Mono.fromCallable(() ->
+                friendshipRepository.findByUserIdAndFriendId(userId, friendId)
+                        .map(Friendship::getStatus)
+                        .map(Enum::name)
+                        .orElse("Not a friend")
+        );
     }
 }

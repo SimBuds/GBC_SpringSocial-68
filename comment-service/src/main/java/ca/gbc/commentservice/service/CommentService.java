@@ -14,6 +14,6 @@ public interface CommentService {
     Mono<CommentResponse> updateComment(Long commentId, CommentRequest commentRequest);
     Mono<ResponseEntity<Void>> deleteComment(Long commentId);
     Mono<CommentResponse> getCommentById(Long commentId);
-
+    Flux<CommentResponse> getCommentsByPostId(String postId);
 }
 

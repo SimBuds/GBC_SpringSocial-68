@@ -55,4 +55,10 @@ public class CommentController {
         return commentService.deleteComment(commentId)
                 .thenReturn(ResponseEntity.noContent().build());
     }
+
+    @GetMapping("/post/{postId}")
+    public Flux<CommentResponse> getCommentsByPostId(@PathVariable("postId") String postId) {
+        return commentService.getCommentsByPostId(postId);
+    }
+
 }

@@ -1,4 +1,4 @@
-package ca.gbc.friendservice.service;
+package ca.gbc.friendservice.config;
 
 import ca.gbc.friendservice.dto.UserRequest;
 import org.springframework.stereotype.Service;
@@ -10,14 +10,17 @@ public class UserServiceClient {
     private final WebClient webClient;
 
     public UserServiceClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://user-service").build();
+        this.webClient = webClientBuilder.baseUrl("http://user-service:8083").build();
     }
 
     public Mono<UserRequest> getUserDetails(String userId) {
         return webClient.get()
-                .uri("/users/" + userId)
+                .uri("/api/users" + userId)
                 .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> Mono.error(new RuntimeException("Failed to fetch user details"))
+                )
                 .bodyToMono(UserRequest.class);
     }
 }
-

@@ -5,11 +5,11 @@ import reactor.core.publisher.Mono;
 public interface FriendshipService {
     Mono<Void> createFriendship(String userId, String friendId);
 
-    void acceptFriendship(String userId, String friendId);
+    Mono<Void> acceptFriendship(String userId, String friendId);
 
-    void rejectFriendship(String userId, String friendId);
+    Mono<Void> rejectFriendship(String userId, String friendId);
 
-    void deleteFriendship(String userId, String friendId);
+    Mono<Void> deleteFriendship(String userId, String friendId);
 
-    String getFriendshipStatus(String userId, String friendId);
+    Mono<String> getFriendshipStatus(String userId, String friendId);
 }

@@ -1,9 +1,11 @@
 package ca.gbc.postservice.service;
 
+import ca.gbc.postservice.config.CommentServiceClient;
+import ca.gbc.postservice.config.UserServiceClient;
 import ca.gbc.postservice.dto.CommentResponse;
 import ca.gbc.postservice.dto.PostRequest;
 import ca.gbc.postservice.dto.PostResponse;
-import ca.gbc.postservice.dto.UserRequest;
+import ca.gbc.postservice.dto.UserResponse;
 import ca.gbc.postservice.model.Post;
 import ca.gbc.postservice.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -78,18 +80,20 @@ public class PostServiceImpl implements PostService {
         return Flux.fromIterable(postRepository.findAll())
                 .flatMap(post -> Mono.zip(
                         userServiceClient.getUserById(Long.parseLong(post.getAuthorId())),
-                        commentServiceClient.getCommentsByPostId(Long.parseLong(post.getId())).collectList(),
+                        commentServiceClient.getCommentsByPostId(post.getId()).collectList(),
                         (userResponse, comments) -> mapToDto(post, userResponse, comments)
                 ));
     }
 
-    private PostResponse mapToDto(Post post, UserRequest userResponse, List<CommentResponse> comments) {
+    private PostResponse mapToDto(Post post, UserResponse userResponse, List<CommentResponse> comments) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .authorId(userResponse.getUsername())
+                .authorName(userResponse.getFullName())
                 .comments(comments)
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .build();
     }
 }

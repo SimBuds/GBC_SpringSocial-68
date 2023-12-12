@@ -23,14 +23,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createUser(UserRequest userRequest) {
-        // Check if a user with the same username already exists
         User existingUser = userRepository.getUserByUsername(userRequest.getUsername());
         if (existingUser != null) {
             logger.error("User already exists with username: {}", userRequest.getUsername());
             throw new RuntimeException("User already exists");
         }
 
-        // Create a new user
         User user = new User();
         user.setId(userRequest.getId());
         user.setUsername(userRequest.getUsername());
@@ -50,7 +48,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
 
-        // Update the user
         existingUser.setUsername(userRequest.getUsername());
         existingUser.setEmail(userRequest.getEmail());
         existingUser.setFullName(userRequest.getFullName());
