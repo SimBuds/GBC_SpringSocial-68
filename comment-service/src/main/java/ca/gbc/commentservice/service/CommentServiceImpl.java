@@ -7,10 +7,10 @@ import ca.gbc.commentservice.repository.CommentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,52 +18,59 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final UserServiceClient userServiceClient;
 
     @Override
-    public void createComment(CommentRequest commentRequest) {
-        Comment comment = new Comment();
-        comment.setPostId(commentRequest.getPostId());
-        comment.setContent(commentRequest.getContent());
-        comment.setAuthorId(commentRequest.getAuthorId());
-        commentRepository.save(comment);
-    }
-
-    @Override
-    public String updateComment(Long commentId, CommentRequest commentRequest) {
+    public Mono<CommentResponse> createComment(CommentRequest commentRequest) {
+        Comment newComment = new Comment(); // Rename the variable to avoid conflict
         LocalDateTime now = LocalDateTime.now();
-        Comment comment = commentRepository.getById(commentId); // Changed here
-        comment.setPostId(commentRequest.getPostId());
-        comment.setContent(commentRequest.getContent());
-        comment.setAuthorId(commentRequest.getAuthorId());
-        comment.setUpdatedAt(now);
-        commentRepository.save(comment);
-        return comment.getId().toString();
+        newComment.setPostId(commentRequest.getPostId());
+        newComment.setContent(commentRequest.getContent());
+        newComment.setAuthorId(commentRequest.getAuthorId());
+        newComment.setCreatedAt(now);
+        newComment.setUpdatedAt(now);
+
+        return commentRepository.save(newComment)
+                .flatMap(savedComment -> this.mapToDtoWithUserDetails(savedComment)); // Avoid variable redefinition
+    }
+    @Override
+    public Mono<CommentResponse> updateComment(Long commentId, CommentRequest commentRequest) {
+        return commentRepository.findById(commentId)
+                .map(comment -> {
+                    comment.setContent(commentRequest.getContent());
+                    comment.setUpdatedAt(LocalDateTime.now());
+                    return comment;
+                })
+                .flatMap(commentRepository::save)
+                .flatMap(this::mapToDtoWithUserDetails);
     }
 
     @Override
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId); // Changed here
+    public Mono<Void> deleteComment(Long commentId) {
+        return commentRepository.deleteById(commentId);
     }
 
     @Override
-    public List<CommentResponse> getAllComments() {
-        return commentRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    public Mono<CommentResponse> getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .flatMap(this::mapToDtoWithUserDetails);
     }
 
     @Override
-    public String getCommentById(Long commentId) {
-        Comment comment = commentRepository.getById(commentId); // Changed here
-        return comment.getAuthorId();
+    public Flux<CommentResponse> getAllComments() {
+        return commentRepository.findAll()
+                .flatMap(this::mapToDtoWithUserDetails);
     }
 
-    private CommentResponse mapToDto(Comment comment) {
-        return CommentResponse.builder()
-                .id(comment.getId())
-                .postId(comment.getPostId())
-                .content(comment.getContent())
-                .authorId(comment.getAuthorId())
-                .createdAt(comment.getCreatedAt())
-                .updatedAt(comment.getUpdatedAt())
-                .build();
+    private Mono<CommentResponse> mapToDtoWithUserDetails(Comment comment) {
+        return userServiceClient.getUserDetails(comment.getAuthorId())
+                .map(user -> CommentResponse.builder()
+                        .id(comment.getId())
+                        .postId(comment.getPostId())
+                        .content(comment.getContent())
+                        .authorId(comment.getAuthorId())
+                        .createdAt(comment.getCreatedAt())
+                        .updatedAt(comment.getUpdatedAt())
+                        .build());
     }
 }

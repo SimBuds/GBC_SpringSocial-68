@@ -1,8 +1,9 @@
 package ca.gbc.commentservice.repository;
 
 import ca.gbc.commentservice.model.Comment;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
-    Comment getById(Long id);
+import java.util.Optional;
+
+public interface CommentRepository extends ReactiveCrudRepository<Comment, Long> {
 }

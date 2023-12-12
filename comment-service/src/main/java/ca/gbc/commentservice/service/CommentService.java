@@ -2,17 +2,15 @@ package ca.gbc.commentservice.service;
 
 import ca.gbc.commentservice.dto.CommentRequest;
 import ca.gbc.commentservice.dto.CommentResponse;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface CommentService {
-    void createComment(CommentRequest commentRequest);
+    Mono<CommentResponse> createComment(CommentRequest commentRequest);
+    Flux<CommentResponse> getAllComments();
+    Mono<CommentResponse> updateComment(Long commentId, CommentRequest commentRequest);
+    Mono<Void> deleteComment(Long commentId);
+    Mono<CommentResponse> getCommentById(Long commentId);
 
-    List<CommentResponse> getAllComments();
-
-    String updateComment(Long commentId, CommentRequest commentRequest);
-
-    void deleteComment(Long commentId);
-
-    String getCommentById(Long commentId);
 }
+

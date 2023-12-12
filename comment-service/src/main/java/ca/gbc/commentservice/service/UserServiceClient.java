@@ -1,6 +1,6 @@
-package ca.gbc.postservice.service;
+package ca.gbc.commentservice.service;
 
-import ca.gbc.postservice.dto.UserRequest;
+import ca.gbc.commentservice.dto.UserRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -13,11 +13,13 @@ public class UserServiceClient {
         this.webClient = webClientBuilder.baseUrl("http://user-service").build();
     }
 
-    public Mono<UserRequest> getUserById(Long userId) {
+    public Mono<UserRequest> getUserDetails(String userId) {
         return webClient.get()
-                .uri("/api/users/" + userId)
+                .uri("/users/" + userId)
                 .retrieve()
                 .bodyToMono(UserRequest.class);
     }
+
+
 }
 

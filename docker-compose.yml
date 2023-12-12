@@ -93,22 +93,6 @@ services:
     networks:
       - spring
 
-  friend-service:
-    image: friend-service
-    ports:
-      - "8084:8084"
-    build:
-      context: ./friend-service
-      dockerfile: ./Dockerfile
-    container_name: friend-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    restart: unless-stopped
-    depends_on:
-      - postgres-friend
-    networks:
-      - spring
-
   post-service:
     image: post-service
     ports:
@@ -154,6 +138,22 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres-user
+    networks:
+      - spring
+
+  friend-service:
+    image: friend-service
+    ports:
+      - "8084:8084"
+    build:
+      context: ./friend-service
+      dockerfile: ./Dockerfile
+    container_name: friend-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+    depends_on:
+      - postgres-friend
     networks:
       - spring
 

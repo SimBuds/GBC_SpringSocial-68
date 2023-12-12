@@ -1,5 +1,6 @@
 package ca.gbc.postservice.service;
 
+import ca.gbc.postservice.dto.CommentResponse;
 import ca.gbc.postservice.dto.PostRequest;
 import ca.gbc.postservice.dto.PostResponse;
 import ca.gbc.postservice.dto.UserRequest;
@@ -12,8 +13,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final MongoTemplate mongoTemplate;
     private final UserServiceClient userServiceClient;
+    private final CommentServiceClient commentServiceClient;
 
     @Override
     public void createPost(PostRequest postRequest) {
@@ -72,17 +76,20 @@ public class PostServiceImpl implements PostService {
     public Flux<PostResponse> getAllPosts() {
         log.info("Getting all posts");
         return Flux.fromIterable(postRepository.findAll())
-                .flatMap(post -> userServiceClient.getUserById(post.getAuthorId())
-                        .map(userResponse -> mapToDto(post, userResponse)));
+                .flatMap(post -> Mono.zip(
+                        userServiceClient.getUserById(Long.parseLong(post.getAuthorId())),
+                        commentServiceClient.getCommentsByPostId(Long.parseLong(post.getId())).collectList(),
+                        (userResponse, comments) -> mapToDto(post, userResponse, comments)
+                ));
     }
 
-
-    private PostResponse mapToDto(Post post, UserRequest userResponse) {
+    private PostResponse mapToDto(Post post, UserRequest userResponse, List<CommentResponse> comments) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .authorId(userResponse.getUsername())
+                .comments(comments)
                 .build();
     }
 }

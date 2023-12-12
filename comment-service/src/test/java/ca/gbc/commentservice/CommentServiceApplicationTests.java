@@ -7,7 +7,6 @@ import ca.gbc.commentservice.repository.CommentRepository;
 import ca.gbc.commentservice.service.CommentService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 
 	@Autowired
@@ -75,7 +74,8 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 						.content(commentRequestString))
 				.andExpect(MockMvcResultMatchers.status().isCreated());
 
-		Assertions.assertTrue(commentRepository.findAll().size() > 0);
+		Long count = commentRepository.findAll().count().block();
+		Assertions.assertTrue(count != null && count > 0);
 	}
 
 	@Test
@@ -95,7 +95,8 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 	void updateComment() throws Exception {
 		commentService.createComment(getCommentRequest());
 
-		Comment savedComment = commentRepository.findAll().stream().findFirst().orElse(null);
+		Mono<Comment> savedCommentMono = commentRepository.findAll().next();
+		Comment savedComment = savedCommentMono.block();
 		Assertions.assertNotNull(savedComment, "Expected saved comment not to be null");
 
 		CommentRequest updatedCommentRequest = CommentRequest.builder()
@@ -115,7 +116,8 @@ public class CommentServiceApplicationTests extends AbstractContainerBaseTest {
 	void deleteComment() throws Exception {
 		commentService.createComment(getCommentRequest());
 
-		Comment savedComment = commentRepository.findAll().stream().findFirst().orElse(null);
+		Mono<Comment> savedCommentMono = commentRepository.findAll().next();
+		Comment savedComment = savedCommentMono.block();
 		Assertions.assertNotNull(savedComment, "Expected saved comment not to be null");
 
 		mockMvc.perform(MockMvcRequestBuilders
