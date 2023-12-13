@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -100,16 +101,17 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Flux<CommentResponse> getAllComments() {
-        return Flux.defer(() -> {
-                    return Flux.fromIterable(commentRepository.findAll());
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .map(this::mapToDto);
+        return Flux.defer(() -> Flux.fromIterable(commentRepository.findAll()))
+                .map(this::mapToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public Flux<CommentResponse> getCommentsByPostId(String postId) {
-        return commentRepository.findByPostId(postId)
+        return Flux.defer(() -> {
+                    List<Comment> comments = commentRepository.findByPostId(postId);
+                    return Flux.fromIterable(comments);
+                })
                 .map(this::mapToDto)
                 .subscribeOn(Schedulers.boundedElastic());
     }

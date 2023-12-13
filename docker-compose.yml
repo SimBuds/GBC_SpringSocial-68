@@ -32,6 +32,29 @@ services:
     networks:
       - spring
 
+  keycloak:
+    image: jboss/keycloak:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=POSTGRES
+      - DB_ADDR=postgres-keycloak
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=mypass
+      - KEYCLOAK_IMPORT=/opt/jboss/keycloak/realms/realm-export.json
+      - KEYCLOAK_LOGLEVEL=DEBUG
+      - JWT_ISSUER_URI=http://keycloak:8080/auth/realms/Spring-social-68
+    container_name: keycloak
+    restart: unless-stopped
+    depends_on:
+      - postgres-keycloak
+      - discovery-service
+    networks:
+      - spring
+
   postgres-user:
     image: postgres:latest
     ports:
@@ -73,6 +96,21 @@ services:
       - ./data/postgres-friend:/var/lib/postgresql/data
       - ./init/postgres/friend-service/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     container_name: postgres-friend
+    restart: unless-stopped
+    networks:
+      - spring
+
+  postgres-keycloak:
+    image: postgres:latest
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=keycloak
+    volumes:
+      - ./data/postgres-keycloak:/var/lib/postgresql/data
+    container_name: postgres-keycloak
     restart: unless-stopped
     networks:
       - spring

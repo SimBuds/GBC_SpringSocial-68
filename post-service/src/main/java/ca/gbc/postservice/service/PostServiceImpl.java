@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -76,13 +76,19 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Flux<PostResponse> getAllPosts() {
-        log.info("Getting all posts");
         return Flux.fromIterable(postRepository.findAll())
                 .flatMap(post -> Mono.zip(
-                        userServiceClient.getUserById(Long.parseLong(post.getAuthorId())),
-                        commentServiceClient.getCommentsByPostId(post.getId()).collectList(),
-                        (userResponse, comments) -> mapToDto(post, userResponse, comments)
-                ));
+                        Mono.just(post),
+                        userServiceClient.getUserById(post.getAuthorId()).defaultIfEmpty(new UserResponse()),
+                        commentServiceClient.getCommentsByPostId(post.getId()).collectList()
+                ))
+                .map(tuple -> {
+                    Post post = tuple.getT1();
+                    UserResponse userResponse = tuple.getT2();
+                    List<CommentResponse> comments = tuple.getT3();
+                    return mapToDto(post, userResponse, comments);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private PostResponse mapToDto(Post post, UserResponse userResponse, List<CommentResponse> comments) {

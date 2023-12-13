@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -19,57 +18,66 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createUser(@Valid @RequestBody UserRequest userRequest) {
-        userService.createUser(userRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest userRequest) {
+        try {
+            userService.createUser(userRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
-        UserResponse user = userService.getUserByUsername(userId);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            UserResponse user = userService.getUserByUsername(userId);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(
+    public ResponseEntity<?> updateUser(
             @PathVariable String userId,
             @Valid @RequestBody UserRequest userRequest) {
-        UserResponse updatedUser = userService.updateUser(userId, userRequest);
-        if (updatedUser == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            UserResponse updatedUser = userService.updateUser(userId, userRequest);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
-        userService.deleteUser(userId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteUser(@PathVariable String userId) {
+        try {
+            userService.deleteUser(userId);
+            return ResponseEntity.ok("User with ID " + userId + " has been deleted successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.");
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> loginUser(@Valid @RequestBody UserRequest userRequest) {
-        UserResponse username = userService.loginUser(userRequest);
-        if (username == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> loginUser(@Valid @RequestBody UserRequest userRequest) {
+        try {
+            UserResponse username = userService.loginUser(userRequest);
+            return ResponseEntity.ok("User " + username.getUsername() + " has logged in successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logoutUser(@Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<String> logoutUser(@Valid @RequestBody UserRequest userRequest) {
         userService.logoutUser(userRequest);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok("User has logged out successfully.");
     }
 }

@@ -60,5 +60,4 @@ public class CommentController {
     public Flux<CommentResponse> getCommentsByPostId(@PathVariable("postId") String postId) {
         return commentService.getCommentsByPostId(postId);
     }
-
 }

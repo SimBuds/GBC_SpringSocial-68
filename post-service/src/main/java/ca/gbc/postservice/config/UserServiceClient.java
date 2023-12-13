@@ -16,7 +16,7 @@ public class UserServiceClient {
         this.webClient = webClientBuilder.baseUrl("http://user-service:8083").build();
     }
 
-    public Mono<UserResponse> getUserById(Long userId) {
+    public Mono<UserResponse> getUserById(String userId) {
         return webClient.get()
                 .uri("/api/users/" + userId)
                 .retrieve()
@@ -24,4 +24,3 @@ public class UserServiceClient {
                 .doOnError(error -> LOGGER.error("Error while calling user-service: {}", error.getMessage()));
     }
 }
-
