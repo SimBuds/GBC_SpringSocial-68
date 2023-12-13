@@ -14,6 +14,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     networks:
       - spring
+    restart: unless-stopped
 
   api-gateway:
     image: api-gateway
@@ -44,14 +45,16 @@ services:
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
       - DB_PASSWORD=mypass
-      - KEYCLOAK_IMPORT=/opt/jboss/keycloak/realms/realm-export.json
+      - KEYCLOAK_IMPORT=/realms/realm-export.json
       - KEYCLOAK_LOGLEVEL=DEBUG
       - JWT_ISSUER_URI=http://keycloak:8080/auth/realms/Spring-social-68
+    volumes:
+      - ./realms/realm-export.json:/realms/realm-export.json
     container_name: keycloak
     restart: unless-stopped
     depends_on:
-      - postgres-keycloak
-      - discovery-service
+      postgres-keycloak:
+        condition: service_healthy
     networks:
       - spring
 
@@ -114,6 +117,11 @@ services:
     restart: unless-stopped
     networks:
       - spring
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   mongodb:
     image: mongo:latest
@@ -201,6 +209,15 @@ services:
     depends_on:
       - postgres-friend
       - discovery-service
+    networks:
+      - spring
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    container_name: zipkin-local
     networks:
       - spring
 

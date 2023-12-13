@@ -23,15 +23,5 @@ CREATE TABLE IF NOT EXISTS comments (
     updated_at TIMESTAMP
     );
 
--- Insert some data into comments table
-INSERT INTO comments (post_id, content, author_id, created_at, updated_at)
-VALUES
-    ('1', 'This is a comment', 'user1', '2019-01-01 00:00:00', '2019-01-01 00:00:00'),
-    ('1', 'This is another comment', 'user2', '2019-01-01 00:00:00', '2019-01-01 00:00:00'),
-    ('2', 'This is a comment', 'user1', '2019-01-01 00:00:00', '2019-01-01 00:00:00'),
-    ('2', 'This is another comment', 'user2', '2019-01-01 00:00:00', '2019-01-01 00:00:00'),
-    ('3', 'This is a comment', 'user1', '2019-01-01 00:00:00', '2019-01-01 00:00:00'),
-    ('3', 'This is another comment', 'user2', '2019-01-01 00:00:00', '2019-01-01 00:00:00');
-
 -- Commit the transaction
 COMMIT;

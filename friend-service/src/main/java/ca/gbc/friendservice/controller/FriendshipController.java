@@ -1,5 +1,6 @@
 package ca.gbc.friendservice.controller;
 
+import ca.gbc.friendservice.dto.FriendshipRequest;
 import ca.gbc.friendservice.service.FriendshipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,26 +15,26 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
 
     @PostMapping("/request")
-    public ResponseEntity<?> createFriendshipRequest(@RequestParam String userId, @RequestParam String friendId) {
-        friendshipService.createFriendship(userId, friendId);
+    public ResponseEntity<?> createFriendshipRequest(@RequestBody FriendshipRequest request) {
+        friendshipService.createFriendship(request.getUserId(), request.getFriendId());
         return ResponseEntity.ok("Friendship request sent.");
     }
 
     @PostMapping("/accept")
-    public ResponseEntity<?> acceptFriendship(@RequestParam String userId, @RequestParam String friendId) {
-        friendshipService.acceptFriendship(userId, friendId);
+    public ResponseEntity<?> acceptFriendship(@RequestBody FriendshipRequest request) {
+        friendshipService.acceptFriendship(request.getUserId(), request.getFriendId());
         return ResponseEntity.ok("Friendship accepted.");
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<?> rejectFriendship(@RequestParam String userId, @RequestParam String friendId) {
-        friendshipService.rejectFriendship(userId, friendId);
+    public ResponseEntity<?> rejectFriendship(@RequestBody FriendshipRequest request) {
+        friendshipService.rejectFriendship(request.getUserId(), request.getFriendId());
         return ResponseEntity.ok("Friendship rejected.");
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> deleteFriendship(@RequestParam String userId, @RequestParam String friendId) {
-        friendshipService.deleteFriendship(userId, friendId);
+    public ResponseEntity<?> deleteFriendship(@RequestBody FriendshipRequest request) {
+        friendshipService.deleteFriendship(request.getUserId(), request.getFriendId());
         return ResponseEntity.ok("Friendship removed.");
     }
 

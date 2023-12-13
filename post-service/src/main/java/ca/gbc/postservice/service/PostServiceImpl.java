@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -38,6 +39,8 @@ public class PostServiceImpl implements PostService {
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
                 .authorId(postRequest.getAuthorId())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         postRepository.save(post);
 
@@ -46,7 +49,6 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public String updatePost(String postId, PostRequest postRequest) {
-
         LocalDateTime now = LocalDateTime.now();
         log.info("Updating post: {}", postId);
 
@@ -60,18 +62,25 @@ public class PostServiceImpl implements PostService {
             post.setAuthorId(postRequest.getAuthorId());
             post.setUpdatedAt(now);
 
+            postRepository.save(post);
             log.info("Post updated successfully: {}", postId);
-            return postRepository.save(post).getId();
+            return post.getId();
+        } else {
+            log.error("No post found with ID: {}", postId);
         }
 
-        return postId;
+        return null;
     }
 
     @Override
     public void deletePost(String postId) {
         log.info("Deleting post: {}", postId);
-        postRepository.deleteById(postId);
-        log.info("Post deleted successfully: {}", postId);
+        if (postRepository.existsById(postId)) {
+            postRepository.deleteById(postId);
+            log.info("Post deleted successfully: {}", postId);
+        } else {
+            log.error("No post found with ID: {}", postId);
+        }
     }
 
     @Override
@@ -96,8 +105,8 @@ public class PostServiceImpl implements PostService {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .authorName(userResponse.getFullName())
-                .comments(comments)
+                .authorId(userResponse.getFullName() != null ? userResponse.getFullName() : "Unknown Author")
+                .comments(comments != null ? comments : Collections.emptyList())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

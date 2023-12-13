@@ -23,10 +23,5 @@ CREATE TABLE IF NOT EXISTS friends (
     updated_at TIMESTAMP DEFAULT NOW()     -- Timestamp of the last update
     );
 
--- Insert some sample data into the friends table
-INSERT INTO friends (user_id, friend_id, status)
-VALUES
-    ('user1', 'user2', 'PENDING');
-
 -- Commit the transaction
 COMMIT;
