@@ -1,6 +1,7 @@
 package ca.gbc.friendservice.config;
 
 import ca.gbc.friendservice.dto.UserRequest;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -13,6 +14,7 @@ public class UserServiceClient {
         this.webClient = webClientBuilder.baseUrl("http://user-service:8083").build();
     }
 
+    @Cacheable("users")
     public Mono<UserRequest> getUserDetails(String userId) {
         return webClient.get()
                 .uri("/api/users" + userId)

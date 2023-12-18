@@ -29,10 +29,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Mono<CommentResponse> createComment(CommentRequest commentRequest) {
         return userServiceWebClient.get()
-                // Only append the path segment specific to the user retrieval operation
                 .uri("/api/users/{id}", commentRequest.getAuthorId())
                 .retrieve()
-                // Handle the case when the user is not found by the user service
                 .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse ->
                         Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")))
                 .bodyToMono(UserResponse.class)

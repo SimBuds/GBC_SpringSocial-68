@@ -38,6 +38,7 @@ dependencies {
 	implementation 'io.zipkin.reporter2:zipkin-reporter-brave:2.16.4'
 	implementation 'io.micrometer:micrometer-observation:1.11.4'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave:1.1.4'
+	implementation 'io.github.resilience4j:resilience4j-spring-boot2:2.1.0'
 }
 
 tasks.named('test') {

@@ -6,7 +6,9 @@ import ca.gbc.friendservice.model.FriendshipStatus;
 import ca.gbc.friendservice.repository.FriendshipRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -67,7 +69,8 @@ public class FriendshipServiceImpl implements FriendshipService {
     public Mono<Void> deleteFriendship(String userId, String friendId) {
         return Mono.fromCallable(() ->
                         friendshipRepository.findByUserIdAndFriendId(userId, friendId)
-                                .orElseThrow(() -> new RuntimeException("Friendship not found"))
+                                .orElseThrow(() -> new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND, "Friendship not found"))
                 )
                 .doOnSuccess(friendship -> {
                     friendshipRepository.delete(friendship);

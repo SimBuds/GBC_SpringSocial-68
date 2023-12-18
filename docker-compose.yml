@@ -48,6 +48,7 @@ services:
       - KEYCLOAK_IMPORT=/realms/realm-export.json
       - KEYCLOAK_LOGLEVEL=DEBUG
       - JWT_ISSUER_URI=http://keycloak:8080/auth/realms/Spring-social-68
+
     volumes:
       - ./realms/realm-export.json:/realms/realm-export.json
     container_name: keycloak
